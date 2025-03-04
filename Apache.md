@@ -91,11 +91,11 @@ $ sudo tail -f /var/log/apache2/error.log
 
 **Install**
 ```
-sudo apt install goaccess -y
+$ sudo apt install goaccess -y
 ```
 **Analyze logs:**
 ```
-sudo goaccess /var/log/apache2/access.log --log-format=COMBINED
+$ sudo goaccess /var/log/apache2/access.log --log-format=COMBINED
 ```
 
 ## Enable Apache as a Reverse Proxy
@@ -103,7 +103,40 @@ sudo goaccess /var/log/apache2/access.log --log-format=COMBINED
 Enable proxy modules:
 
 ```
-sudo a2enmod proxy proxy_http
+$ sudo a2enmod proxy proxy_http
 
 ```
+**Create a new site:**
+```
+$ sudo nano /etc/apache2/sites-available/reverse-proxy.conf
+```
+**Add this to file**
 
+```
+<VirtualHost *:80>
+    ServerName proxy.example.com
+    ProxyPass / http://backend.example.com/
+    ProxyPassReverse / http://backend.example.com/
+</VirtualHost>
+
+```
+**Enable the site and restart Apache:**
+```
+$ sudo a2ensite reverse-proxy.conf
+$ sudo systemctl restart apache2
+
+```
+## Disable Server Signature
+```
+$ sudo nano /etc/apache2/apache2.conf
+```
+**Add the following content and save the file**
+```
+ServerSignature Off
+ServerTokens Prod
+
+```
+```
+$ sudo systemctl restart apache2
+
+```
